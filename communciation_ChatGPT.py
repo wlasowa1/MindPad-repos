@@ -1,7 +1,10 @@
+# -- This py file is used for handling communication with ChatGPT -- #
+
+#importing libraries
 import os 
 from openai import OpenAI 
 
-# getting OPENAI API KEY
+# getting OPENAI API KEY from environment variable 
 os.environ.get("OPENAI_API_KEY")
 
 # Create client
@@ -18,7 +21,4 @@ def ChatGPT_API(prompt):
         "content": prompt}
         ],
     )
-    #max_tokens = 650 # Limit the response to 650 tokens
     return response.choices[0].message.content
-
-print(ChatGPT_API("Create a bedtime story with turtle as a main character"))
