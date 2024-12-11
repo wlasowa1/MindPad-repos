@@ -1,0 +1,121 @@
+import time
+import RPi.GPIO as GPIO  #works only on Raspberry Pi hardware
+
+# GPIO setup
+GPIO.setmode(GPIO.BCM)  #use BCM pin numbering
+
+input_pins = [22, 23, 24]  #pins for mc1/mc2/mc3, p1/p2/p3, etc.
+
+functional_buttons = {
+    "yes": 8,          # GPIO8
+    "no": 1,           # GPIO1
+    "play/pause": 7    # GPIO7
+}
+
+#define buttons
+main_character = {22: "a dog", 23: "a duck", 24: "a turtle"}
+place = {22: "jungle", 23: "castle", 24: "space"}
+mission = {22: "finding treasure", 23: "helping friend", 24: "adventure"}
+friend = {22: "cat", 23: "owl", 24: "giraffe"}
+twist = {22: "magic", 23: "special talent", 24: "surprise"}
+
+#GPIO setup
+for pin in input_pins:
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+for name, pin in functional_buttons.items():
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+#function to detect button press from input pins
+def detect_button_press():
+    for pin in input_pins:
+        if GPIO.input(pin) == GPIO.LOW:  #button is pressed
+            time.sleep(0.2)  #debounce delay
+            return pin
+    return None
+
+#function to detect functional button press
+def check_functional_buttons():
+    for name, pin in functional_buttons.items():
+        if GPIO.input(pin) == GPIO.LOW:  #button is pressed
+            time.sleep(0.2)  #debounce delay
+            return name
+    return None
+
+def main():
+    try:
+        #initialize stage and selected options
+        stage = "intro"
+        selected_maincharacter = None
+        selected_place = None
+        selected_mission = None
+        selected_friend = None
+        selected_twist = None
+
+        print("It's almost bedtime, do you want to create your bedtime story?")
+
+        while True:
+            if stage == "intro":
+                button = check_functional_buttons()
+                if button == "yes":
+                    print("Choose your main character: a dog, a duck, or a turtle.")
+                    stage = "choose_character"
+                elif button == "no":
+                    print("Goodnight! Turning off the device...")
+                    GPIO.cleanup()
+                    break
+
+            elif stage == "choose_character":
+                pin = detect_button_press()
+                if pin in main_character:
+                    selected_main_character = main_character[pin]
+                    print(f"You chose {selected_maincharacter} as the main character!")
+                    print("Where should the story take place? Jungle, Castle, or Space?")
+                    stage = "choose_place"
+
+            elif stage == "choose_place":
+                pin = detect_button_press()
+                if pin in place:
+                    selected_place = place[pin]
+                    print(f"You chose {selected_place} as the place!")
+                    print("What should the mission be? Finding treasure, Helping a friend, or Adventure?")
+                    stage = "choose_mission"
+
+            elif stage == "choose_mission":
+                pin = detect_button_press()
+                if pin in mission:
+                    selected_mission = mission[pin]
+                    print(f"You chose {selected_mission} as the mission!")
+                    print("Who is the friend of the main character? Cat, Owl, or Giraffe?")
+                    stage = "choose_friend"
+
+            elif stage == "choose_friend":
+                pin = detect_button_press()
+                if pin in friend:
+                    selected_friend = friend[pin]
+                    print(f"You chose {selected_friend} as the friend!")
+                    print("What about a twist? Magic, Special Talent, or Surprise?")
+                    stage = "choose_twist"
+
+            elif stage == "choose_twist":
+                pin = detect_button_press()
+                if pin in twist:
+                    selected_twist = twist[pin]
+                    print(f"You chose {selected_twist} as the twist!")
+
+                    #choice summary
+                    print(f"Main character is {selected_maincharacter}, "
+                          f"place is {selected_place}, "
+                          f"mission is {selected_mission}, "
+                          f"friend is {selected_friend}, "
+                          f"twist is {selected_twist}.")
+                    break  # Exit after completing the story creation
+
+            time.sleep(0.1)  #delay to avoid high CPU usage
+
+   
+    finally:
+        GPIO.cleanup()  # Clean up GPIO pins
+
+if __name__ == "__main__":
+    main()
