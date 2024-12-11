@@ -7,18 +7,18 @@ GPIO.setmode(GPIO.BCM)  #use BCM pin numbering
 #define pins for buttons
 pins = [22, 23, 24]  #buttons row 1 connected to pin 22, row 2 to pin 23, and row 3 to pin 24
 
-#set up pins as inputs with pull-up resistors
+#set up pins as inputs with pull-down resistors
 for pin in pins:
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 try:
-    print("press a button to test...")
+    print("Press a button to test...")
 
     while True:
         for pin in pins:
-            if GPIO.input(pin) == GPIO.LOW:  #button is pressed
-                print(f"button on pin {pin} pressed")
-                time.sleep(0.2)  #debounce delay
+            if GPIO.input(pin) == GPIO.HIGH:  # Button is pressed
+                print(f"Button on pin {pin} pressed")
+                time.sleep(0.2)  # Debounce delay
 
 finally:
     GPIO.cleanup()  #clean up GPIO pins
