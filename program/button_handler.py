@@ -33,7 +33,7 @@ def init():
     logger.c_print(__name__, "System initialized.")
 
 #button callback functinons
-def yes():
+def yes(channel):
     logger.c_print(__name__, "Button yes was pushed!")
     if gsv.state == "startup" or gsv.state == "new story":
         gsv.state = "create mc"
@@ -49,19 +49,19 @@ def yes():
     
 
 
-def volume_up():
+def volume_up(channel):
     logger.c_print(__name__, "Button volume_up was pushed!")
     sound_handler.update_volume("up")
 
-def volume_down():
+def volume_down(channel):
     logger.c_print(__name__, "Button volume_down was pushed!")
     sound_handler.update_volume("down")
 
-def play_pause():
+def play_pause(channel):
     logger.c_print(__name__, "Button play_pause was pushed!")
     sound_handler.toggle_play_pause()
 
-def no():
+def no(channel):
     logger.c_print(__name__, "Button no was pushed!")
     if gsv.state == "startup" or gsv.state == "new story":
         sound_handler.play_sound(gsv.PROMPTS[gsv.current_language]["goodnight"])
@@ -70,7 +70,7 @@ def no():
         gsv.state = "new story"
         logger.c_print(__name__, "Changed state to " + gsv.state)
     
-def language():
+def language(channel):
     logger.c_print(__name__, "Button language was pushed!")
     start_time = time.time()
     while GPIO.input(gsv.functional_pins['language']) == GPIO.HIGH:
@@ -78,13 +78,13 @@ def language():
             _change_language()
         time.sleep(1)
 
-def select_option_row1():
+def select_option_row1(channel):
     _select_option(22)
 
-def select_option_row2():
+def select_option_row2(channel):
     _select_option(23)
 
-def select_option_row3():
+def select_option_row3(channel):
     _select_option(24)
 
 def _select_option(pin):

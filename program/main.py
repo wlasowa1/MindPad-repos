@@ -1,7 +1,4 @@
 import logger
-import RPi.GPIO as GPIO #library that works just on raspberry pi
-import bedtime_storyteller
-import T2S_openAI
 import button_handler
 import sound_handler
 import global_static_variables as gsv
