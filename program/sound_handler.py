@@ -4,14 +4,8 @@ import pygame  #library for audio play
 import global_static_variables as gsv
 
 
-volume_level = 0.5
+volume_level = 0.8
 is_playing = False
-
-#initialize pygame mixer for audio play
-def init():
-    logger.c_print(__name__, "Initializing of sound_handler.")
-    pygame.mixer.init()
-    pygame.mixer.music.set_volume(volume_level)
 
 #function - play MP3 files (thread secure function :) 
 def play_sound(file_path):
@@ -63,3 +57,8 @@ def toggle_play_pause():
         logger.c_print(__name__, "Resuming...")
         pygame.mixer.unpause()
         is_playing = True
+
+#initialize pygame mixer for audio play
+logger.c_print(__name__, "Initializing of sound_handler.")
+pygame.mixer.init()
+pygame.mixer.music.set_volume(volume_level)

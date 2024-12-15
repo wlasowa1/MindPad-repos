@@ -1,8 +1,8 @@
 import time 
 import logger
 import RPi.GPIO as GPIO #library that works just on raspberry pi
-import bedtime_storyteller
 import global_static_variables as gsv
+import bedtime_storyteller
 import sound_handler 
 
 #variables for storing user choices
@@ -13,24 +13,6 @@ current_choices = {
     'f': None,
     't': None
 }
-
-def init():
-    #GPIO setup
-    GPIO.setmode(GPIO.BCM)
-
-    #set up GPIO pins as inputs with pull-down resistors
-    for pin in set(gsv.main_character.keys()).union(
-        gsv.place.keys(), gsv.mission.keys(), gsv.friend.keys(), gsv.twist.keys()
-    ):
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-    for pin in gsv.functional_pins.values():
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-    for dict[int, str] in gsv.button_event_map:
-        GPIO.add_event_callback(dict.key, GPIO.RISING, callback = dict.value)
-
-    logger.c_print(__name__, "System initialized.")
 
 #button callback functinons
 def yes(channel):
@@ -66,17 +48,15 @@ def no(channel):
     if gsv.state == "startup" or gsv.state == "new story":
         sound_handler.play_sound(gsv.PROMPTS[gsv.current_language]["goodnight"])
         sound_handler.play_sound(gsv.SOUNDS["outro"])
+        gsv.state = "startup"
+        logger.c_print(__name__, "Changed state to " + gsv.state)
     elif gsv.state == "continue story":
         gsv.state = "new story"
         logger.c_print(__name__, "Changed state to " + gsv.state)
     
 def language(channel):
     logger.c_print(__name__, "Button language was pushed!")
-    start_time = time.time()
-    while GPIO.input(gsv.functional_pins['language']) == GPIO.HIGH:
-        if time.time() - start_time >= 5:  # 5 second press
-            _change_language()
-        time.sleep(1)
+    _change_language()
 
 def select_option_row1(channel):
     _select_option(22)
@@ -136,3 +116,30 @@ def _reset_choices():
     for key in current_choices.keys():
         current_choices[key] = None
     logger.c_print(__name__, "Choices have been reset.")
+
+#GPIO setup
+logger.c_print(__name__, "Initializing of button_handler.")
+GPIO.setmode(GPIO.BCM)
+
+    #set up GPIO pins as inputs with pull-down resistors
+for pin in set(gsv.main_character.keys()).union(
+        gsv.place.keys(), gsv.mission.keys(), gsv.friend.keys(), gsv.twist.keys()
+    ):
+    logger.c_print(__name__, f"Pin {pin} has been setup with GPIO.PUD_DOWN.")
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+for pin in gsv.functional_pins.values():
+    logger.c_print(__name__, f"Pin {pin} has been setup with GPIO.PUD_DOWN.")
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+#setting events
+logger.c_print(__name__,"Setting events")
+GPIO.add_event_detect(7, GPIO.RISING, callback = yes, bouncetime=300) # 1
+GPIO.add_event_detect(5, GPIO.RISING, callback = volume_up, bouncetime=300)
+GPIO.add_event_detect(6, GPIO.RISING, callback = volume_down, bouncetime=300) # 7
+GPIO.add_event_detect(1, GPIO.RISING, callback= play_pause, bouncetime=300)
+GPIO.add_event_detect(8, GPIO.RISING, callback = no, bouncetime=300) # 8
+#GPIO.add_event_detect(17, GPIO.RISING, channel = language, bouncetime=300)
+GPIO.add_event_detect(22, GPIO.RISING, callback = select_option_row1, bouncetime=300)
+GPIO.add_event_detect(23, GPIO.RISING, callback = select_option_row2, bouncetime=300)
+GPIO.add_event_detect(24, GPIO.RISING, callback = select_option_row3, bouncetime=300)
