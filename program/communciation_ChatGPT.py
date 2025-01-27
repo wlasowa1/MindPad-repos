@@ -4,7 +4,7 @@ import logger
 from openai import OpenAI 
 
 # getting OPENAI API KEY from environment variable 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "HERE_INSERT_APIKEY"
 
 # Create client
 client = OpenAI()
